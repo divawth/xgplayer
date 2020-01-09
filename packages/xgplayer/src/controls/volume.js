@@ -8,6 +8,9 @@ let volume = function () {
   function onCanplay () {
     player.volume = Player.sniffer.device === 'mobile' ? 1 : player.config.volume
     container = player.controls.querySelector('.xgplayer-volume')
+    if (!container || !container.querySelector) {
+      return
+    }
     slider = container.querySelector('.xgplayer-slider')
     bar = container.querySelector('.xgplayer-bar')
     selected = container.querySelector('.xgplayer-drag')
@@ -81,7 +84,11 @@ let volume = function () {
     } else {
       player.video.muted = false
       if (player.volume < 0.1) {
-        player.volume = slider.volume
+        if(slider.volume < 0.1) {
+          player.volume = 0.6
+        } else {
+          player.volume = slider.volume
+        }
       } else {
         player.volume = 0
       }
@@ -128,8 +135,10 @@ let volume = function () {
         } else {
           util.addClass(root, 'xgplayer-volume-large')
         }
-        let containerHeight = bar.getBoundingClientRect().height || 76
-        selected.style.height = `${player.volume * containerHeight}px`
+        let containerHeight = bar ? bar.getBoundingClientRect().height || 76 : 76
+        if (selected) {
+          selected.style.height = `${player.volume * containerHeight}px`
+        }
       }
     }, 50)
   }
